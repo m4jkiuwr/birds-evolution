@@ -31,6 +31,11 @@ impl Chromosome {
         Self { genes }
     }
 
+    pub fn test(size: usize) -> Self {
+        let genes = (0..size).map(|n| n as f32).collect();
+        Self { genes }
+    }
+
     pub fn len(&self) -> usize {
         self.genes.len()
     }
