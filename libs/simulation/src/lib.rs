@@ -1,4 +1,4 @@
-mod world_props;
+pub mod world_props;
 use rand::{Rng, RngCore};
 use world_props::*;
 
