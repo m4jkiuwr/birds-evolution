@@ -1,4 +1,4 @@
 [workspace]
 resolver = "2"
-members = ["libs/genetic-algorithm", "libs/network"]
+members = ["libs/genetic-algorithm", "libs/network", "libs/simulation-wasm"]
 

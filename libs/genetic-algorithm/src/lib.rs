@@ -61,23 +61,39 @@ mod tests {
     use std::collections::BTreeMap;
     use std::iter::FromIterator;
 
-    struct TestIndividual {
-        fitness: f32,
+    #[derive(Debug, Clone, PartialEq)]
+    enum TestIndividual {
+        WithChromosome { chromosome: Chromosome },
+        WithFitness { fitness: f32 },
     }
     impl TestIndividual {
         fn new(fitness: f32) -> Self {
-            Self { fitness }
+            Self::WithFitness { fitness }
         }
     }
     impl Individual for TestIndividual {
         fn fitness(&self) -> f32 {
-            self.fitness
+            match self {
+                Self::WithChromosome { chromosome } => chromosome.iter().sum(),
+                Self::WithFitness { fitness } => *fitness,
+            }
         }
         fn chromosome(&self) -> &Chromosome {
-            panic!("fun chromosome is not supported in these tests")
+            match self {
+                Self::WithFitness { .. } => panic!("Wrong use of WithFitness in tests"),
+                Self::WithChromosome { chromosome } => chromosome,
+            }
         }
         fn create(chromosome: Chromosome) -> Self {
-            todo!();
+            Self::WithChromosome { chromosome }
+        }
+    }
+    impl PartialEq for Chromosome {
+        fn eq(&self, other: &Self) -> bool {
+            approx::relative_eq!(
+                self.clone().into_iter().as_slice(),
+                other.clone().into_iter().as_slice()
+            )
         }
     }
 
@@ -114,6 +130,40 @@ mod tests {
 
         assert_eq!(diff_a, 49);
         assert_eq!(diff_b, 51);
+    }
+
+    #[test]
+    fn genetic_algorithm() {
+        fn individual(genes: &[f32]) -> TestIndividual {
+            TestIndividual::WithChromosome {
+                chromosome: Chromosome::new(genes.iter().cloned().collect()),
+            }
+        }
+
+        let mut rng = ChaCha8Rng::from_seed(Default::default());
+        let ga = GeneticAlgorithm::new(
+            RouletteSelection {},
+            UniformCrossover {},
+            GaussianMutation::new(0.5, 0.5),
+        );
+        let mut population = vec![
+            individual(&[0.0, 0.0, 0.0]),
+            individual(&[1.0, 1.0, 2.0]),
+            individual(&[1.0, 2.0, 1.0]),
+            individual(&[1.0, 2.0, 4.0]),
+        ];
+
+        for _ in 0..10 {
+            population = ga.evolve(&mut rng, &population);
+        }
+        let expected_population = vec![
+            individual(&[0.6002736, 1.3938547, 4.3595104]),
+            individual(&[1.0955307, 2.4240465, 3.6959934]),
+            individual(&[1.275308, 2.4675508, 3.8890047]),
+            individual(&[1.0225875, 2.4240465, 4.3595104]),
+        ];
+
+        assert_eq!(population, expected_population);
     }
 
     mod gaussian_mutation {
