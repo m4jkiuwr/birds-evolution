@@ -1,26 +1,14 @@
 mod animal;
+mod food;
 
 use nalgebra as na;
 use rand::{Rng, RngCore};
+use std::f32::consts::PI;
 
 use animal::*;
+use food::*;
 
 const EAT_RADIUS: f32 = 0.01;
-
-#[derive(Debug)]
-pub struct Food {
-    position: na::Point2<f32>,
-}
-impl Food {
-    pub fn random(rng: &mut dyn RngCore) -> Self {
-        Self {
-            position: na::Point2::new(rng.random(), rng.random()),
-        }
-    }
-    pub fn position(&self) -> na::Point2<f32> {
-        self.position
-    }
-}
 
 #[derive(Debug)]
 pub struct World {
