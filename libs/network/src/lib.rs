@@ -1,10 +1,13 @@
 mod layer;
-mod layer_topology;
 mod neuron;
 
-use crate::{layer::*, layer_topology::*, neuron::*};
+use crate::{layer::*, neuron::*};
 
 use rand::{Rng, RngCore};
+
+pub struct LayerTopology {
+    pub neuron_count: usize,
+}
 
 #[derive(Debug)]
 pub struct Network {

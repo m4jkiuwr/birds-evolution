@@ -10,12 +10,27 @@ pub struct Animal {
 }
 impl Animal {
     pub fn random(rng: &mut dyn RngCore) -> Self {
-        let brain = todo!();
+        let eye = Eye::default();
+        let brain = nn::Network::random(
+            rng,
+            &[
+                // our input - one from each eye-cell
+                nn::LayerTopology {
+                    neuron_count: eye.cells(),
+                },
+                // Just more than first layer *instinct*
+                nn::LayerTopology {
+                    neuron_count: 2 * eye.cells(),
+                },
+                // 2 Cause we output rotation and speed
+                nn::LayerTopology { neuron_count: 2 },
+            ],
+        );
         Self {
             position: na::Point2::new(rng.random(), rng.random()),
             rotation: na::Rotation2::new(rng.random::<f32>() * 4.0 * PI),
             speed: 0.002,
-            eye: Eye::default(),
+            eye,
             brain,
         }
     }
