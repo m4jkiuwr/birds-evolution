@@ -3,6 +3,7 @@ mod eye;
 mod food;
 mod world;
 
+use lib_neural_network as nn;
 use nalgebra as na;
 use rand::{Rng, RngCore};
 use std::f32::consts::PI;
