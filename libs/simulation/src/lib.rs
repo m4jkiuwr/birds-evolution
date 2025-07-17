@@ -1,4 +1,5 @@
 mod animal;
+mod eye;
 mod food;
 mod world;
 
@@ -6,9 +7,7 @@ use nalgebra as na;
 use rand::{Rng, RngCore};
 use std::f32::consts::PI;
 
-use animal::*;
-use food::*;
-use world::*;
+pub use self::{animal::*, eye::*, food::*, world::*};
 
 const EAT_RADIUS: f32 = 0.01;
 
