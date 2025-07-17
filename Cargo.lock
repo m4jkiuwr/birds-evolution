@@ -78,7 +78,9 @@ dependencies = [
 name = "lib-neural-network"
 version = "0.1.0"
 dependencies = [
+ "approx",
  "rand 0.9.1",
+ "rand_chacha",
 ]
 
 [[package]]

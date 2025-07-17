@@ -2,8 +2,8 @@ use crate::*;
 
 #[derive(Debug)]
 pub(crate) struct Neuron {
-    bias: f32,
-    input_weights: Vec<f32>,
+    pub(crate) bias: f32,
+    pub(crate) input_weights: Vec<f32>,
 }
 impl Neuron {
     pub(crate) fn propagate(&self, inputs: &Vec<f32>) -> f32 {
