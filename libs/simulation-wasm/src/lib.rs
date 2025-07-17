@@ -11,9 +11,9 @@ pub struct Simulation {
 #[wasm_bindgen]
 impl Simulation {
     #[wasm_bindgen(constructor)]
-    pub fn new() -> Self {
+    pub fn new(animal_num: usize, food_num: usize) -> Self {
         let mut rng = rand::rng();
-        let sim = sim::Simulation::random(&mut rng);
+        let sim = sim::Simulation::random(&mut rng, animal_num, food_num);
         Self { rng, sim }
     }
 
@@ -72,5 +72,23 @@ impl From<&sim::World> for World {
         let animals = value.animals().iter().map(Animal::from).collect();
         let foods = value.foods().iter().map(Food::from).collect();
         Self { animals, foods }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    #[test]
+    fn random() {
+        let mut sim = super::Simulation::new(1, 1000);
+        for _ in 0..=10 {
+            for (ind, animal) in &mut sim.world().animals.iter().enumerate() {
+                println!(
+                    "num: {} coords : ({} | {}) | rotation: {}",
+                    ind, animal.x, animal.y, animal.rotation
+                );
+            }
+            sim.step();
+        }
     }
 }

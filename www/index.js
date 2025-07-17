@@ -36,7 +36,7 @@ CanvasRenderingContext2D.prototype.drawCircle =
     this.fill();
   }
 
-const simulation = new sim.Simulation();
+const simulation = new sim.Simulation(30, 80);
 
 function reDraw() {
   ctxt.clearRect(0, 0, viewportWidth, viewportHeight);

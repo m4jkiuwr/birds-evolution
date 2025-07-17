@@ -12,8 +12,8 @@ pub use self::{animal::*, eye::*, food::*, world::*};
 
 const EAT_RADIUS: f32 = 0.01;
 
-const SPEED_MAX: f32 = 0.01;
-const SPEED_MIN: f32 = 0.05;
+const SPEED_MIN: f32 = 0.001;
+const SPEED_MAX: f32 = 0.007;
 
 const SPEED_ACCEL: f32 = 0.01;
 const ROTATION_ACCEL: f32 = FRAC_PI_2;
@@ -24,9 +24,9 @@ pub struct Simulation {
 }
 
 impl Simulation {
-    pub fn random(rng: &mut dyn RngCore) -> Self {
+    pub fn random(rng: &mut dyn RngCore, animal_num: usize, food_num: usize) -> Self {
         Self {
-            world: World::random(rng),
+            world: World::random(rng, animal_num, food_num),
         }
     }
 }
@@ -37,8 +37,8 @@ impl Simulation {
     }
 
     pub fn step(&mut self, rng: &mut dyn RngCore) {
-        self.movement();
         self.collisions(rng);
+        self.movement();
         self.think();
     }
 
