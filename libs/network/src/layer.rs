@@ -13,8 +13,8 @@ impl Layer {
             .collect()
     }
 
-    pub(crate) fn random(inputs: usize, outputs: usize) -> Self {
-        let neurons = (0..outputs).map(|_| Neuron::random(inputs)).collect();
+    pub(crate) fn random(rng: &mut dyn RngCore, inputs: usize, outputs: usize) -> Self {
+        let neurons = (0..outputs).map(|_| Neuron::random(rng, inputs)).collect();
         Self { neurons }
     }
 }

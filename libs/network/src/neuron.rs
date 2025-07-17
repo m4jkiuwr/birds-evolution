@@ -15,8 +15,7 @@ impl Neuron {
             .fold(self.bias, |init, (&w, &i)| init + w * i)
             .max(0.0)
     }
-    pub(crate) fn random(inputs: usize) -> Self {
-        let mut rng = rand::rng();
+    pub(crate) fn random(rng: &mut dyn RngCore, inputs: usize) -> Self {
         let bias = rng.random_range(-1.0..=1.0);
         let input_weights = (0..inputs).map(|_| rng.random_range(-1.0..=1.0)).collect();
         Self {

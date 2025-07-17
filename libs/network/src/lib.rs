@@ -4,7 +4,7 @@ mod neuron;
 
 use crate::{layer::*, layer_topology::*, neuron::*};
 
-use rand::Rng;
+use rand::{Rng, RngCore};
 
 #[derive(Debug)]
 pub struct Network {
@@ -18,12 +18,12 @@ impl Network {
             .fold(inputs, |input, layer| layer.propagate(input))
     }
 
-    pub fn random(topology: &[LayerTopology]) -> Self {
+    pub fn random(rng: &mut dyn RngCore, topology: &[LayerTopology]) -> Self {
         assert!(topology.len() > 1);
         Self {
             layers: topology
                 .windows(2)
-                .map(|layers| Layer::random(layers[0].neuron_count, layers[1].neuron_count))
+                .map(|layers| Layer::random(rng, layers[0].neuron_count, layers[1].neuron_count))
                 .collect(),
         }
     }
