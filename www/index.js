@@ -38,11 +38,14 @@ CanvasRenderingContext2D.prototype.drawCircle =
 
 const simulation = new sim.Simulation(30, 80);
 
+
 function reDraw() {
   ctxt.clearRect(0, 0, viewportWidth, viewportHeight);
-  simulation.step();
+  console.log(rangeVal);
+  for (let i = 0; i < rangeVal; i = i + 1) {
+    simulation.step();
+  }
   const world = simulation.world();
-
   for (const animal of world.animals) {
     ctxt.drawTriangle(animal.x * viewportWidth,
       animal.y * viewportHeight,
@@ -57,6 +60,17 @@ function reDraw() {
   requestAnimationFrame(reDraw);
 }
 
+
+const rangeElem = document.getElementById('tempo');
+let [rangeVal, rangeValElem] = [1, document.getElementById('tempo-value')];
+
+rangeElem.addEventListener("input", () => {
+  rangeVal = rangeElem.value;
+  rangeValElem.textContent = rangeElem.value;
+
+});
+
+document.getElementById('train').onclick = () => simulation.train();
 
 
 

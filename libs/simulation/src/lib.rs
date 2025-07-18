@@ -1,5 +1,6 @@
 mod animal;
 mod animal_individual;
+mod brain;
 mod eye;
 mod food;
 mod world;
@@ -10,7 +11,7 @@ use nalgebra as na;
 use rand::{Rng, RngCore};
 use std::f32::consts::{FRAC_PI_2, PI};
 
-pub use self::{animal::*, animal_individual::*, eye::*, food::*, world::*};
+pub use self::{animal::*, animal_individual::*, brain::*, eye::*, food::*, world::*};
 
 const EAT_RADIUS: f32 = 0.01;
 
@@ -54,7 +55,7 @@ impl Simulation {
         &self.world
     }
 
-    pub fn step(&mut self, rng: &mut dyn RngCore) {
+    pub fn step(&mut self, rng: &mut dyn RngCore) -> bool {
         self.movement();
         self.think();
         self.collisions(rng);
@@ -63,6 +64,9 @@ impl Simulation {
         if self.age > self.gen_age {
             self.age = 0;
             self.evolve(rng);
+            true
+        } else {
+            false
         }
     }
 
@@ -90,7 +94,7 @@ impl Simulation {
                 animal
                     .eye
                     .process_vision(animal.position, animal.rotation, &self.world.foods);
-            let response = animal.brain.propagate(vision);
+            let response = animal.brain.network.propagate(vision);
 
             let speed = response[0].clamp(-SPEED_ACCEL, SPEED_ACCEL);
             let rotation = response[1].clamp(-ROTATION_ACCEL, ROTATION_ACCEL);
@@ -116,6 +120,13 @@ impl Simulation {
 
         for food in &mut self.world.foods {
             food.position = na::Point2::new(rng.random(), rng.random());
+        }
+    }
+    pub fn train(&mut self, rng: &mut dyn RngCore) {
+        loop {
+            if self.step(rng) {
+                return;
+            }
         }
     }
 }

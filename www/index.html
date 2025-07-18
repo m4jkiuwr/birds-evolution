@@ -4,16 +4,41 @@
 <head>
   <meta charset="utf-8">
   <title>Ptaszki !!!</title>
-</head>
-<style>
-  body {
-    background-color: #1f2639;
-  }
-</style>
+  <style>
+    body {
+      background-color: #1f2639;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding-top: 20px;
+      font-family: sans-serif;
+      color: white;
+    }
 
+    #controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    canvas {
+      border: 1px solid #555;
+    }
+  </style>
+</head>
 
 <body>
-  <canvas id="viewport" width="800" height="800"></canvas>
+  <div id="controls">
+    <canvas id="viewport" width="800" height="800"></canvas>
+    <button id="train">Fast-train to next gen</button>
+    <input id="tempo" type="range" min="1" max="10" value="1" />
+    <div>
+      <label for="tempo">Steps per frame: </label><span id="tempo-value">1</span>
+    </div>
+  </div>
+
   <script src="./bootstrap.js"></script>
 </body>
 
