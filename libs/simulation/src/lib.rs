@@ -55,18 +55,16 @@ impl Simulation {
         &self.world
     }
 
-    pub fn step(&mut self, rng: &mut dyn RngCore) -> bool {
+    pub fn step(&mut self, rng: &mut dyn RngCore) -> Option<ga::Statistics> {
         self.movement();
         self.think();
         self.collisions(rng);
 
         self.age += 1;
         if self.age > self.gen_age {
-            self.age = 0;
-            self.evolve(rng);
-            true
+            Some(self.evolve(rng))
         } else {
-            false
+            None
         }
     }
 
@@ -103,7 +101,9 @@ impl Simulation {
             animal.rotation = na::Rotation2::new(animal.rotation.angle() + rotation);
         }
     }
-    fn evolve(&mut self, rng: &mut dyn RngCore) {
+    fn evolve(&mut self, rng: &mut dyn RngCore) -> ga::Statistics {
+        self.age = 0;
+
         let curr_population: Vec<AnimalIndividual> = self
             .world
             .animals
@@ -111,7 +111,7 @@ impl Simulation {
             .map(AnimalIndividual::from_animal)
             .collect();
 
-        let evolved_population = self.ga.evolve(rng, &curr_population);
+        let (evolved_population, stats) = self.ga.evolve(rng, &curr_population);
 
         self.world.animals = evolved_population
             .iter()
@@ -121,11 +121,13 @@ impl Simulation {
         for food in &mut self.world.foods {
             food.position = na::Point2::new(rng.random(), rng.random());
         }
+
+        stats
     }
-    pub fn train(&mut self, rng: &mut dyn RngCore) {
+    pub fn train(&mut self, rng: &mut dyn RngCore) -> ga::Statistics {
         loop {
-            if self.step(rng) {
-                return;
+            if let Some(stats) = self.step(rng) {
+                break stats;
             }
         }
     }

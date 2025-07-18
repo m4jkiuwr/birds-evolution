@@ -15,25 +15,18 @@ CanvasRenderingContext2D.prototype.drawTriangle =
       x + size * Math.sin(- innerAngle * PI + rotation + PI),
       y - size * Math.cos(- innerAngle * PI + rotation + PI)
     ]
-    this.beginPath();
 
     this.moveTo(...a);
     this.lineTo(...b);
     this.lineTo(...c);
     this.lineTo(...a);
 
-    // this.strokeStyle = 'rgb(0,0,0)';
-    this.fillStyle = 'rgba(217, 226, 246, 1)';
-    this.fill();
-
   }
 
 CanvasRenderingContext2D.prototype.drawCircle =
   function (x, y, size) {
-    this.beginPath();
+    this.moveTo(x, y)
     this.arc(x, y, size, 0, 2.0 * Math.PI);
-    this.fillStyle = 'rgba(72, 178, 100, 1)';
-    this.fill();
   }
 
 const simulation = new sim.Simulation(30, 80);
@@ -41,11 +34,14 @@ const simulation = new sim.Simulation(30, 80);
 
 function reDraw() {
   ctxt.clearRect(0, 0, viewportWidth, viewportHeight);
-  console.log(rangeVal);
   for (let i = 0; i < rangeVal; i = i + 1) {
-    simulation.step();
+    const info = simulation.step();
+    if (info != "") console.log(info);
   }
   const world = simulation.world();
+
+  ctxt.fillStyle = 'rgba(217, 226, 246, 1)';
+  ctxt.beginPath();
   for (const animal of world.animals) {
     ctxt.drawTriangle(animal.x * viewportWidth,
       animal.y * viewportHeight,
@@ -53,9 +49,14 @@ function reDraw() {
       animal.rotation,
       4.7 / 6.0);
   }
+  ctxt.fill();
+
+  ctxt.fillStyle = 'rgba(72, 178, 100, 1)';
+  ctxt.beginPath();
   for (const food of world.foods) {
     ctxt.drawCircle(food.x * viewportWidth, food.y * viewportHeight, 0.005 * viewportWidth);
   }
+  ctxt.fill();
 
   requestAnimationFrame(reDraw);
 }
@@ -70,7 +71,7 @@ rangeElem.addEventListener("input", () => {
 
 });
 
-document.getElementById('train').onclick = () => simulation.train();
+document.getElementById('train').onclick = () => console.log(simulation.train());
 
 
 

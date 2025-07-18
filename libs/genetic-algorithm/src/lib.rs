@@ -2,10 +2,11 @@ mod chromosome;
 mod crossing;
 mod mutation;
 mod roulette;
+mod statistics;
 mod traits;
 use rand::{self, RngCore};
 
-pub use self::{chromosome::*, crossing::*, mutation::*, roulette::*, traits::*};
+pub use self::{chromosome::*, crossing::*, mutation::*, roulette::*, statistics::*, traits::*};
 
 pub struct GeneticAlgorithm<S> {
     selection_method: S,
@@ -28,13 +29,13 @@ where
         }
     }
 
-    pub fn evolve<I>(&self, rng: &mut dyn RngCore, population: &[I]) -> Vec<I>
+    pub fn evolve<I>(&self, rng: &mut dyn RngCore, population: &[I]) -> (Vec<I>, Statistics)
     where
         I: Individual,
     {
         assert!(!population.is_empty());
 
-        (0..population.len())
+        let new_population: Vec<I> = (0..population.len())
             .map(|_| {
                 let par_a = self.selection_method.select(rng, &population);
                 let par_b = self.selection_method.select(rng, &population);
@@ -45,7 +46,10 @@ where
                 self.mutation_method.mutate(rng, &mut child);
                 I::create(child)
             })
-            .collect()
+            .collect();
+        let stats = Statistics::new(population);
+
+        (new_population, stats)
     }
 }
 
@@ -157,7 +161,7 @@ mod tests {
         ];
 
         for _ in 0..10 {
-            population = ga.evolve(&mut rng, &population);
+            (population, _) = ga.evolve(&mut rng, &population);
         }
         let expected_population = vec![
             individual(&[0.6002736, 1.3938547, 4.3595104]),

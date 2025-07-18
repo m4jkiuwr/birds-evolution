@@ -21,12 +21,17 @@ impl Simulation {
         World::from(self.sim.world())
     }
 
-    pub fn step(&mut self) {
-        self.sim.step(&mut self.rng);
+    pub fn step(&mut self) -> String {
+        if let Some(stats) = self.sim.step(&mut self.rng) {
+            stats.to_string()
+        } else {
+            String::from("")
+        }
     }
 
-    pub fn train(&mut self) {
-        self.sim.train(&mut self.rng);
+    pub fn train(&mut self) -> String {
+        let stats = self.sim.train(&mut self.rng);
+        stats.to_string()
     }
 }
 
