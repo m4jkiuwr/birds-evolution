@@ -23,4 +23,14 @@ impl Neuron {
             input_weights,
         }
     }
+    pub(crate) fn from_weights(inputs: usize, weights: &mut dyn Iterator<Item = f32>) -> Self {
+        let bias = weights.next().expect("Not enough weights provided!");
+        let input_weights = (0..inputs)
+            .map(|_| weights.next().expect("Not enough weights provided!"))
+            .collect();
+        Self {
+            bias,
+            input_weights,
+        }
+    }
 }

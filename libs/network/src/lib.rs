@@ -1,7 +1,9 @@
 mod layer;
 mod neuron;
 
-use crate::{layer::*, neuron::*};
+use std::iter::once;
+
+use self::{layer::*, neuron::*};
 
 use rand::{Rng, RngCore};
 
@@ -28,6 +30,31 @@ impl Network {
                 .windows(2)
                 .map(|layers| Layer::random(rng, layers[0].neuron_count, layers[1].neuron_count))
                 .collect(),
+        }
+    }
+
+    pub fn weights(&self) -> impl Iterator<Item = f32> + '_ {
+        self.layers
+            .iter()
+            .flat_map(|layer| layer.neurons.iter())
+            .flat_map(|neuron| once(&neuron.bias).chain(&neuron.input_weights))
+            .copied()
+    }
+    pub fn from_weights(
+        topology: &[LayerTopology],
+        weights: impl IntoIterator<Item = f32>,
+    ) -> Self {
+        let mut weights = weights.into_iter();
+        let layers = topology
+            .windows(2)
+            .map(|layers| {
+                Layer::from_weights(layers[0].neuron_count, layers[1].neuron_count, &mut weights)
+            })
+            .collect();
+        if weights.next().is_some() {
+            panic!("Received too many weights!");
+        } else {
+            Self { layers }
         }
     }
 }
@@ -62,5 +89,40 @@ mod tests {
             neuron.propagate(&vec![0.5, 1.0]),
             (0.5 * -0.3) + (1.0 * 0.8) + 0.5
         )
+    }
+    #[test]
+    fn weights() {
+        let network = Network {
+            layers: vec![
+                Layer {
+                    neurons: vec![Neuron {
+                        bias: 0.1,
+                        input_weights: vec![0.2, 0.3, 0.4],
+                    }],
+                },
+                Layer {
+                    neurons: vec![Neuron {
+                        bias: 0.5,
+                        input_weights: vec![0.6, 0.7, 0.8],
+                    }],
+                },
+            ],
+        };
+        let actual_weights: Vec<f32> = network.weights().collect();
+        let expected_weights = vec![0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
+        assert_eq!(actual_weights, expected_weights)
+    }
+    #[test]
+    fn from_weights() {
+        let topology = &[
+            LayerTopology { neuron_count: 3 },
+            LayerTopology { neuron_count: 2 },
+        ];
+
+        let weights = vec![0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
+        let network = Network::from_weights(topology, weights.clone());
+
+        let actual: Vec<f32> = network.weights().collect();
+        assert_eq!(weights.as_slice(), actual.as_slice())
     }
 }

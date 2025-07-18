@@ -1,10 +1,11 @@
 mod chromosome;
-pub mod crossing;
-pub mod mutation;
-pub mod roulette;
+mod crossing;
+mod mutation;
+mod roulette;
 mod traits;
 use rand::{self, RngCore};
-use traits::*;
+
+pub use self::{chromosome::*, crossing::*, mutation::*, roulette::*, traits::*};
 
 pub struct GeneticAlgorithm<S> {
     selection_method: S,

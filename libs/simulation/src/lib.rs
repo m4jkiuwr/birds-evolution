@@ -1,4 +1,5 @@
 mod animal;
+mod animal_individual;
 mod eye;
 mod food;
 mod world;
@@ -9,7 +10,7 @@ use nalgebra as na;
 use rand::{Rng, RngCore};
 use std::f32::consts::{FRAC_PI_2, PI};
 
-pub use self::{animal::*, eye::*, food::*, world::*};
+pub use self::{animal::*, animal_individual::*, eye::*, food::*, world::*};
 
 const EAT_RADIUS: f32 = 0.01;
 
@@ -23,14 +24,27 @@ const GENERATION_AGE: usize = 2500;
 
 pub struct Simulation {
     world: World,
-    ga: ga::GeneticAlgorithm<ga::roulette::RouletteSelection>,
+    ga: ga::GeneticAlgorithm<ga::RouletteSelection>,
     age: usize,
+    gen_age: usize,
 }
 
 impl Simulation {
     pub fn random(rng: &mut dyn RngCore, animal_num: usize, food_num: usize) -> Self {
+        let world = World::random(rng, animal_num, food_num);
+        let ga = ga::GeneticAlgorithm::new(
+            ga::RouletteSelection {},
+            ga::UniformCrossover {},
+            ga::GaussianMutation::new(0.01, 0.3),
+        );
+        let age = 0;
+        let gen_age = GENERATION_AGE;
+
         Self {
-            world: World::random(rng, animal_num, food_num),
+            world,
+            ga,
+            age,
+            gen_age,
         }
     }
 }
@@ -41,9 +55,15 @@ impl Simulation {
     }
 
     pub fn step(&mut self, rng: &mut dyn RngCore) {
-        self.collisions(rng);
         self.movement();
         self.think();
+        self.collisions(rng);
+
+        self.age += 1;
+        if self.age > self.gen_age {
+            self.age = 0;
+            self.evolve(rng);
+        }
     }
 
     fn movement(&mut self) {
@@ -59,6 +79,7 @@ impl Simulation {
                 let distance = na::distance(&animal.position, &food.position);
                 if distance <= EAT_RADIUS {
                     food.position = na::Point2::new(rng.random(), rng.random());
+                    animal.food_counter += 1;
                 }
             }
         }
@@ -76,6 +97,25 @@ impl Simulation {
 
             animal.speed = (animal.speed + speed).clamp(SPEED_MIN, SPEED_MAX);
             animal.rotation = na::Rotation2::new(animal.rotation.angle() + rotation);
+        }
+    }
+    fn evolve(&mut self, rng: &mut dyn RngCore) {
+        let curr_population: Vec<AnimalIndividual> = self
+            .world
+            .animals
+            .iter()
+            .map(AnimalIndividual::from_animal)
+            .collect();
+
+        let evolved_population = self.ga.evolve(rng, &curr_population);
+
+        self.world.animals = evolved_population
+            .iter()
+            .map(|individual| individual.into_animal(rng))
+            .collect();
+
+        for food in &mut self.world.foods {
+            food.position = na::Point2::new(rng.random(), rng.random());
         }
     }
 }

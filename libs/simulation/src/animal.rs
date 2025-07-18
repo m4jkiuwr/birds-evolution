@@ -5,6 +5,7 @@ pub struct Animal {
     pub(crate) position: na::Point2<f32>,
     pub(crate) rotation: na::Rotation2<f32>,
     pub(crate) speed: f32,
+    pub(crate) food_counter: usize,
     pub(crate) eye: Eye,
     pub(crate) brain: nn::Network,
 }
@@ -30,6 +31,7 @@ impl Animal {
             position: na::Point2::new(rng.random(), rng.random()),
             rotation: na::Rotation2::new(rng.random::<f32>() * 4.0 * PI),
             speed: 0.002,
+            food_counter: 0,
             eye,
             brain,
         }
