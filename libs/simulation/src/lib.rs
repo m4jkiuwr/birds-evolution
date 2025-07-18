@@ -3,6 +3,7 @@ mod eye;
 mod food;
 mod world;
 
+use lib_genetic_algorithm as ga;
 use lib_neural_network as nn;
 use nalgebra as na;
 use rand::{Rng, RngCore};
@@ -18,9 +19,12 @@ const SPEED_MAX: f32 = 0.007;
 const SPEED_ACCEL: f32 = 0.01;
 const ROTATION_ACCEL: f32 = FRAC_PI_2;
 
-#[derive(Debug)]
+const GENERATION_AGE: usize = 2500;
+
 pub struct Simulation {
     world: World,
+    ga: ga::GeneticAlgorithm<ga::roulette::RouletteSelection>,
+    age: usize,
 }
 
 impl Simulation {

@@ -4,11 +4,6 @@ use rand::Rng;
 
 pub struct UniformCrossover {}
 
-impl UniformCrossover {
-    pub fn new() -> Self {
-        Self {}
-    }
-}
 impl CrossoverMethod for UniformCrossover {
     fn crossover<'a>(
         &self,
@@ -26,5 +21,3 @@ impl CrossoverMethod for UniformCrossover {
         )
     }
 }
-
-

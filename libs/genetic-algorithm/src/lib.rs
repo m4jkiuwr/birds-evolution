@@ -1,13 +1,9 @@
 mod chromosome;
-mod crossing;
-mod mutation;
-mod roulette;
+pub mod crossing;
+pub mod mutation;
+pub mod roulette;
 mod traits;
-use chromosome::Chromosome;
-use crossing::UniformCrossover;
-use mutation::GaussianMutation;
-use rand::{self, RngCore, seq::IndexedRandom};
-use roulette::RouletteSelection;
+use rand::{self, RngCore};
 use traits::*;
 
 pub struct GeneticAlgorithm<S> {
@@ -55,8 +51,13 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use chromosome::Chromosome;
+    use crossing::UniformCrossover;
+    use mutation::GaussianMutation;
     use rand::SeedableRng;
     use rand_chacha::ChaCha8Rng;
+
+    use roulette::RouletteSelection;
 
     use std::collections::BTreeMap;
     use std::iter::FromIterator;
@@ -123,7 +124,8 @@ mod tests {
         let mut rng = ChaCha8Rng::from_seed(Default::default());
         let parent_a = (1..=100).map(|n| n as f32).collect();
         let parent_b = (1..=100).map(|n| -n as f32).collect();
-        let child = UniformCrossover::new().crossover(&mut rng, &parent_a, &parent_b);
+        let crossover = UniformCrossover {};
+        let child = crossover.crossover(&mut rng, &parent_a, &parent_b);
 
         let diff_a = child.iter().zip(parent_a).filter(|(a, b)| *a != b).count();
         let diff_b = child.iter().zip(parent_b).filter(|(a, b)| *a != b).count();

@@ -2,6 +2,7 @@ use rand::Rng;
 
 use crate::chromosome::Chromosome;
 use crate::traits::MutationMethod;
+
 pub struct GaussianMutation {
     // 0.0 - no genes modified, 1.0 - all genes modified
     chance: f32,
