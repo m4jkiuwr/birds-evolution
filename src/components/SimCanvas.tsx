@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Simulation, World, Animal, Food, wasmReady } from '../wasm'
 import PauseOverlay from './PauseOverlay';
-import { SpeedSlider, PlayButton } from './GenerationInfo';
+import GenerationInfo from './GenerationInfo';
 
 const BIRD_SIZE: number = 0.02;
 const FOOD_SIZE: number = 0.005;
@@ -161,7 +161,7 @@ const SimCanvas: React.FC = () => {
 
 
   return (
-    <>
+    <div className="flex flex-row items-start justify-center gap-8 p-8 bg-gray-900 min-h-screen">
       <div className="relative w-[800px] h-[800px] border border-white">
         <canvas
           ref={canvasRef}
@@ -170,9 +170,13 @@ const SimCanvas: React.FC = () => {
         />
         {!isPlaying && <PauseOverlay onClick={handleSimClick} />}
       </div>
-      <SpeedSlider onChange={handleSliderChange} currentSpeed={simSpeed} />
-      <PlayButton onClick={handleSimClick} isPlaying={isPlaying} />
-    </>
+      <GenerationInfo
+        currentSpeed={simSpeed}
+        isPlaying={isPlaying}
+        sliderChange={handleSliderChange}
+        onPlayButtonClick={handleSimClick}
+      />
+    </div>
   )
 
 }
