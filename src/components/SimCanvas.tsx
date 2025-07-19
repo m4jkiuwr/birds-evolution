@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Simulation, World, Animal, Food, wasmReady } from '../wasm'
 import PauseOverlay from './PauseOverlay';
+import SpeedSlider from './GenerationInfo';
 
 const BIRD_SIZE: number = 0.02;
 const FOOD_SIZE: number = 0.005;
@@ -113,6 +114,7 @@ const SimCanvas: React.FC = () => {
   const simRef = useRef<SimType | null>(null);
   const [world, setWorld] = useState<WorldType | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
+  const [simSpeed, setSimSpeed] = useState<number>(1);
 
   useEffect(() => {
     wasmReady.then(
@@ -137,7 +139,9 @@ const SimCanvas: React.FC = () => {
     let animationFrameId: number;
 
     const gameLoop = () => {
-      simRef.current?.step();
+      for (let i = 0; i < simSpeed; i++) {
+        simRef.current?.step();
+      }
       setWorld(simRef.current!.world());
       animationFrameId = window.requestAnimationFrame(gameLoop)
     };
@@ -145,23 +149,29 @@ const SimCanvas: React.FC = () => {
     gameLoop();
 
     return () => window.cancelAnimationFrame(animationFrameId);
-  }, [isPlaying, simRef.current]);
+  }, [isPlaying, simRef.current, simSpeed]);
 
   const handleSimClick = () => {
     setIsPlaying(!isPlaying);
-
+  }
+  const handleSliderChange = (x: React.ChangeEvent<HTMLInputElement>) => {
+    const newSpeed = Number(x.target.value);
+    setSimSpeed(newSpeed);
   }
 
 
   return (
-    <div className="relative w-[800px] h-[800px] border border-white">
-      <canvas
-        ref={canvasRef}
-        className="w-full h-full"
-        onClick={handleSimClick}
-      />
-      {!isPlaying && <PauseOverlay onClick={handleSimClick} />}
-    </div>
+    <>
+      <div className="relative w-[800px] h-[800px] border border-white">
+        <canvas
+          ref={canvasRef}
+          className="w-full h-full"
+          onClick={handleSimClick}
+        />
+        {!isPlaying && <PauseOverlay onClick={handleSimClick} />}
+      </div>
+      <SpeedSlider onChange={handleSliderChange} currentSpeed={simSpeed} />
+    </>
   )
 
 }
