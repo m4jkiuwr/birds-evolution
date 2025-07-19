@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Simulation, World, Animal, Food, wasmReady } from '../wasm'
 import PauseOverlay from './PauseOverlay';
-import SpeedSlider from './GenerationInfo';
+import { SpeedSlider, PlayButton } from './GenerationInfo';
 
 const BIRD_SIZE: number = 0.02;
 const FOOD_SIZE: number = 0.005;
@@ -171,6 +171,7 @@ const SimCanvas: React.FC = () => {
         {!isPlaying && <PauseOverlay onClick={handleSimClick} />}
       </div>
       <SpeedSlider onChange={handleSliderChange} currentSpeed={simSpeed} />
+      <PlayButton onClick={handleSimClick} isPlaying={isPlaying} />
     </>
   )
 

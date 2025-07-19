@@ -1,4 +1,5 @@
 import React from 'react';
+import { Play } from "lucide-react";
 
 interface PauseOverlayProps {
   onClick: () => void;
