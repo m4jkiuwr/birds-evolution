@@ -3,6 +3,11 @@ use rand::{self, rngs::ThreadRng};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
+pub fn test_fun() -> String {
+    String::from("DZIAAALAAAA")
+}
+
+#[wasm_bindgen]
 pub struct Simulation {
     rng: ThreadRng,
     sim: sim::Simulation,
