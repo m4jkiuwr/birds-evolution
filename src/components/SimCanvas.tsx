@@ -1,8 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Simulation, World, Animal, Food, wasmReady } from '../wasm'
+import PauseOverlay from './PauseOverlay';
 
 const BIRD_SIZE: number = 0.02;
 const FOOD_SIZE: number = 0.005;
+
+const BIRD_ANGLE: number = 4.8 / 6.0;
 
 
 type SimType = InstanceType<typeof Simulation>
@@ -48,7 +51,7 @@ function sharpenCanvas(canvas: HTMLCanvasElement): void {
 
 CanvasRenderingContext2D.prototype.drawBird = function (bird: AnimalType, size: number, width: number, height: number) {
   const [x, y, rotation] = [bird.x * width, bird.y * height, bird.rotation];
-  const innerAngle = 5.0 / 6.0;
+  const innerAngle = BIRD_ANGLE;
   const PI = Math.PI;
   const a = [
     x + size * Math.sin(rotation + PI),
@@ -74,10 +77,6 @@ CanvasRenderingContext2D.prototype.drawFood = function (food: FoodType, size: nu
   this.moveTo(x, y);
   this.arc(x, y, size, 0, 2.0 * Math.PI);
 }
-
-
-
-
 
 const paintCanvas = (world: WorldType, canvasRef: React.RefObject<HTMLCanvasElement | null>) => {
   const canvas = canvasRef.current;
@@ -113,7 +112,7 @@ const SimCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const simRef = useRef<SimType | null>(null);
   const [world, setWorld] = useState<WorldType | null>(null);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isPlaying, setIsPlaying] = useState<boolean>(true);
 
   useEffect(() => {
     wasmReady.then(
@@ -146,28 +145,23 @@ const SimCanvas: React.FC = () => {
     gameLoop();
 
     return () => window.cancelAnimationFrame(animationFrameId);
-  }, [isPlaying]);
+  }, [isPlaying, simRef.current]);
 
   const handleSimClick = () => {
     setIsPlaying(!isPlaying);
+
   }
 
 
   return (
-    <>
-
+    <div className="relative w-[800px] h-[800px] border border-white">
       <canvas
         ref={canvasRef}
-        style={{
-          border: '1px solid white',
-          width: '800px',
-          height: '800px'
-        }}
+        className="w-full h-full"
+        onClick={handleSimClick}
       />
-      <button onClick={handleSimClick}>click</button>
-
-
-    </>
+      {!isPlaying && <PauseOverlay onClick={handleSimClick} />}
+    </div>
   )
 
 }
