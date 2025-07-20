@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Simulation, World, Animal, Food, Statistics } from '../simulation-wasm'
 import { PauseOverlay, HoverOverlay } from './PauseOverlay';
 import GenerationInfo from './GenerationInfo';
+import HistoryChart from './HistoryChart';
 
 const BIRD_SIZE: number = 0.02;
 const FOOD_SIZE: number = 0.005;
@@ -220,19 +221,22 @@ const SimCanvas: React.FC = () => {
           <PauseOverlay onClick={handleSimClick} />
         }
       </div>
-      <GenerationInfo
-        currentSpeed={simSpeed}
-        isPlaying={isPlaying}
-        sliderChange={handleSliderChange}
-        onPlayButtonClick={handleSimClick}
-        minScore={currStats.min_score}
-        avgScore={currStats.avg_score}
-        maxScore={currStats.max_score}
-        generation={statsHistory.length + 1}
-        foodCount={FOOD_COUNT}
-        populationCount={POPULATION_COUNT}
-        onTrainButtonClick={handleTrainClick}
-      />
+      <div className="gap-6">
+        <GenerationInfo
+          currentSpeed={simSpeed}
+          isPlaying={isPlaying}
+          sliderChange={handleSliderChange}
+          onPlayButtonClick={handleSimClick}
+          minScore={currStats.min_score}
+          avgScore={currStats.avg_score}
+          maxScore={currStats.max_score}
+          generation={statsHistory.length + 1}
+          foodCount={FOOD_COUNT}
+          populationCount={POPULATION_COUNT}
+          onTrainButtonClick={handleTrainClick}
+        />
+        <HistoryChart statsHistory={statsHistory} />
+      </div>
     </div>
   )
 
