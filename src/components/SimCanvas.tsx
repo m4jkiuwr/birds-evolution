@@ -6,6 +6,9 @@ import GenerationInfo from './GenerationInfo';
 const BIRD_SIZE: number = 0.02;
 const FOOD_SIZE: number = 0.005;
 
+const POPULATION_COUNT: number = 40;
+const FOOD_COUNT: number = 60;
+
 const BIRD_ANGLE: number = 4.8 / 6.0;
 
 
@@ -149,7 +152,7 @@ const SimCanvas: React.FC = () => {
 
 
   useEffect(() => {
-    simRef.current = startSimulation({ animalCount: 40, foodCount: 60 });
+    simRef.current = startSimulation({ animalCount: POPULATION_COUNT, foodCount: FOOD_COUNT });
     setWorld(simRef.current.world());
   }, []);
   useEffect(() => {
@@ -173,7 +176,9 @@ const SimCanvas: React.FC = () => {
         const genStats: StatType[] = runSimulationStep(simulation, simSpeed);
 
         setWorld(simulation.world());
-        setStatsHistory([...statsHistory, ...genStats]);
+        if (genStats.length > 0) {
+          setStatsHistory(prevHistory => [...prevHistory, ...genStats]);
+        }
         animationFrameId = window.requestAnimationFrame(gameLoop);
       };
 
@@ -190,6 +195,15 @@ const SimCanvas: React.FC = () => {
     const newSpeed = Number(x.target.value);
     setSimSpeed(newSpeed);
   }
+  const handleTrainClick = () => {
+    if (!simRef.current) {
+      return;
+    } else {
+      const newStats: StatType = simRef.current.train();
+      setStatsHistory([...statsHistory, newStats]);
+    }
+  }
+
 
   const currStats = calcStats(world);
 
@@ -214,6 +228,10 @@ const SimCanvas: React.FC = () => {
         minScore={currStats.min_score}
         avgScore={currStats.avg_score}
         maxScore={currStats.max_score}
+        generation={statsHistory.length + 1}
+        foodCount={FOOD_COUNT}
+        populationCount={POPULATION_COUNT}
+        onTrainButtonClick={handleTrainClick}
       />
     </div>
   )

@@ -1,5 +1,5 @@
 import React from "react";
-import { Play, Pause } from "lucide-react";
+import { Play, Pause, FastForward } from "lucide-react";
 
 const IconSize: number = 20;
 
@@ -42,6 +42,24 @@ const PlayButton: React.FC<PlayButtonProps> = ({ onPlayButtonClick, isPlaying })
   );
 }
 
+interface TrainButtonProps {
+  onTrainButtonClick: () => void;
+}
+const TrainButton: React.FC<TrainButtonProps> = ({ onTrainButtonClick }) => {
+  return (
+    <div>
+      <button
+        onClick={onTrainButtonClick}
+      >
+        <FastForward size={IconSize} />
+      </button>
+    </div>
+  );
+
+}
+
+
+
 interface LiveInfoProps {
   minScore: number,
   maxScore: number,
@@ -66,9 +84,31 @@ const LiveInfo: React.FC<LiveInfoProps> = ({ minScore, maxScore, avgScore }) => 
   );
 }
 
+interface GeneralProps {
+  populationCount: number,
+  foodCount: number,
+  generation: number,
+}
+const GeneralInfoDisplay: React.FC<GeneralProps> = ({ generation, populationCount, foodCount }) => {
+  return (
+    <div className="flex flex-col gap-2 text-sm">
+      <div className="flex justify-between items-center">
+        <span className="font-semibold text-gray-300">Generation</span>
+        <span className="font-mono bg-gray-700 px-2 py-0.5 rounded">{generation}</span>
+      </div>
+      <div className="flex justify-between items-center">
+        <span className="font-semibold text-gray-300">Population</span>
+        <span className="font-mono bg-gray-700 px-2 py-0.5 rounded">{populationCount}</span>
+      </div>
+      <div className="flex justify-between items-center">
+        <span className="font-semibold text-gray-300">Food</span>
+        <span className="font-mono bg-gray-700 px-2 py-0.5 rounded">{foodCount}</span>
+      </div>
+    </div>
+  );
+}
 
-
-type GenerationInfoProps = SpeedSliderProps & PlayButtonProps & LiveInfoProps;
+type GenerationInfoProps = SpeedSliderProps & PlayButtonProps & LiveInfoProps & GeneralProps & TrainButtonProps;
 
 const GenerationInfo: React.FC<GenerationInfoProps> = ({
   sliderChange,
@@ -77,33 +117,45 @@ const GenerationInfo: React.FC<GenerationInfoProps> = ({
   isPlaying,
   minScore,
   avgScore,
-  maxScore
+  maxScore,
+  populationCount,
+  foodCount,
+  generation,
+  onTrainButtonClick
 }) => {
   return (
-    <div className="flex flex-col gap-6 p-6 bg-gray-800 text-white rounded-lg shadow-xl w-[300px]">
+    <div className="flex flex-col gap-4 p-6 bg-gray-800 text-white rounded-lg shadow-xl w-[300px]">
       <h2 className="text-2xl font-bold text-center border-b border-gray-600 pb-3">
-        Controls
+        Simulation
       </h2>
 
-      <div className="text-lg">
-        <span className="font-semibold">Generation: </span>
-        <span className="font-mono float-right bg-gray-700 px-2 rounded">2
-        </span>
-      </div>
+      <GeneralInfoDisplay
+        generation={generation}
+        populationCount={populationCount}
+        foodCount={foodCount}
+      />
 
+      <h3 className="text-lg font-bold text-center border-b border-gray-700 pb-2 pt-2">
+        Live Stats
+      </h3>
+      <LiveInfo minScore={minScore} maxScore={maxScore} avgScore={avgScore} />
+
+      <h3 className="text-lg font-bold text-center border-b border-gray-700 pb-2 pt-2">
+        Controls
+      </h3>
       <SpeedSlider
         currentSpeed={currentSpeed}
         sliderChange={sliderChange}
       />
 
-      <div className="flex justify-center pt-4">
+      <div className="flex justify-center gap-4">
         <PlayButton
           isPlaying={isPlaying}
           onPlayButtonClick={onPlayButtonClick}
         />
-      </div>
-      <div className="flex justify-center pt-4">
-        <LiveInfo minScore={minScore} maxScore={maxScore} avgScore={avgScore} />
+        <TrainButton
+          onTrainButtonClick={onTrainButtonClick}
+        />
       </div>
     </div>
   );
