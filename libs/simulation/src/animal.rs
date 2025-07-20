@@ -49,4 +49,7 @@ impl Animal {
     pub fn as_chromosome(&self) -> ga::Chromosome {
         self.brain.as_chromosome()
     }
+    pub fn food_counter(&self) -> usize {
+        self.food_counter
+    }
 }
