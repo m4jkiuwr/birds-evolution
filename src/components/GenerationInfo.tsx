@@ -25,6 +25,7 @@ const SpeedSlider: React.FC<SpeedSliderProps> = ({ sliderChange, currentSpeed })
     </div>
   );
 }
+
 interface PlayButtonProps {
   onPlayButtonClick: () => void;
   isPlaying: boolean;
@@ -40,13 +41,33 @@ const PlayButton: React.FC<PlayButtonProps> = ({ onPlayButtonClick, isPlaying })
     </div>
   );
 }
-type GenerationInfoProps = SpeedSliderProps & PlayButtonProps;
+
+interface LiveInfoProps {
+  minScore: number,
+  maxScore: number,
+  avgScore: number,
+}
+const LiveInfo: React.FC<LiveInfoProps> = ({ minScore, maxScore, avgScore }) => {
+  return (
+    <>
+      {minScore} | {avgScore} | {maxScore}
+    </>
+  );
+
+}
+
+
+
+type GenerationInfoProps = SpeedSliderProps & PlayButtonProps & LiveInfoProps;
 
 const GenerationInfo: React.FC<GenerationInfoProps> = ({
   sliderChange,
   currentSpeed,
   onPlayButtonClick,
   isPlaying,
+  minScore,
+  avgScore,
+  maxScore
 }) => {
   return (
     <div className="flex flex-col gap-6 p-6 bg-gray-800 text-white rounded-lg shadow-xl w-[300px]">
@@ -70,6 +91,9 @@ const GenerationInfo: React.FC<GenerationInfoProps> = ({
           isPlaying={isPlaying}
           onPlayButtonClick={onPlayButtonClick}
         />
+      </div>
+      <div className="flex justify-center pt-4">
+        <LiveInfo minScore={minScore} maxScore={maxScore} avgScore={avgScore} />
       </div>
     </div>
   );

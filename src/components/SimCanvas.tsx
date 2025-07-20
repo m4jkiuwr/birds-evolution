@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Simulation, World, Animal, Food, wasmReady } from '../wasm'
+import { Simulation, World, Animal, Food } from '../simulation-wasm'
 import PauseOverlay from './PauseOverlay';
 import GenerationInfo from './GenerationInfo';
 
@@ -19,37 +19,7 @@ declare global {
     drawBird(bird: AnimalType, size: number, width: number, height: number): void,
     drawFood(food: FoodType, size: number, width: number, height: number): void
   }
-
 }
-interface SimulationProps {
-  animalCount: number,
-  foodCount: number,
-
-}
-
-function startSimulation({ animalCount, foodCount }: SimulationProps): SimType {
-  const sim = new Simulation(animalCount, foodCount);
-  return sim;
-}
-function sharpenCanvas(canvas: HTMLCanvasElement): void {
-  const ctxt = canvas.getContext('2d');
-  if (!ctxt) return;
-
-  const dpr = window.devicePixelRatio || 1;
-
-  const rect = {
-    width: canvas.clientWidth,
-    height: canvas.clientHeight
-  };
-
-  if (canvas.width !== rect.width * dpr || canvas.height !== rect.height * dpr) {
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-
-    ctxt.scale(dpr, dpr);
-  }
-}
-
 CanvasRenderingContext2D.prototype.drawBird = function (bird: AnimalType, size: number, width: number, height: number) {
   const [x, y, rotation] = [bird.x * width, bird.y * height, bird.rotation];
   const innerAngle = BIRD_ANGLE;
@@ -79,6 +49,35 @@ CanvasRenderingContext2D.prototype.drawFood = function (food: FoodType, size: nu
   this.arc(x, y, size, 0, 2.0 * Math.PI);
 }
 
+
+interface SimulationProps {
+  animalCount: number,
+  foodCount: number,
+
+}
+
+function startSimulation({ animalCount, foodCount }: SimulationProps): SimType {
+  const sim = new Simulation(animalCount, foodCount);
+  return sim;
+}
+function sharpenCanvas(canvas: HTMLCanvasElement): void {
+  const ctxt = canvas.getContext('2d');
+  if (!ctxt) return;
+
+  const dpr = window.devicePixelRatio || 1;
+
+  const rect = {
+    width: canvas.clientWidth,
+    height: canvas.clientHeight
+  };
+
+  if (canvas.width !== rect.width * dpr || canvas.height !== rect.height * dpr) {
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+
+    ctxt.scale(dpr, dpr);
+  }
+}
 const paintCanvas = (world: WorldType, canvasRef: React.RefObject<HTMLCanvasElement | null>) => {
   const canvas = canvasRef.current;
   if (!canvas) return;
@@ -105,6 +104,31 @@ const paintCanvas = (world: WorldType, canvasRef: React.RefObject<HTMLCanvasElem
 
 }
 
+type Stats = {
+  min: number,
+  avg: number,
+  max: number
+}
+function calcStats(world: WorldType | null): Stats {
+  if (!world || world.animals.length === 0) {
+    return {
+      min: 0, avg: 0, max: 0
+    }
+  } else {
+    const scores = world.animals.map((value) => value.score);
+
+    const minScore = Math.min(...scores);
+    const maxScore = Math.max(...scores);
+    const avgScore = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+
+    return {
+      min: minScore,
+      max: maxScore,
+      avg: parseFloat(avgScore.toFixed(2))
+    }
+  }
+}
+
 
 
 
@@ -116,13 +140,10 @@ const SimCanvas: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [simSpeed, setSimSpeed] = useState<number>(1);
 
+
   useEffect(() => {
-    wasmReady.then(
-      () => {
-        simRef.current = startSimulation({ animalCount: 10, foodCount: 10 });
-        setWorld(simRef.current.world());
-      }
-    )
+    simRef.current = startSimulation({ animalCount: 10, foodCount: 10 });
+    setWorld(simRef.current.world());
   }, []);
   useEffect(() => {
     if (canvasRef.current) sharpenCanvas(canvasRef.current)
@@ -159,6 +180,7 @@ const SimCanvas: React.FC = () => {
     setSimSpeed(newSpeed);
   }
 
+  const currStats = calcStats(world);
 
   return (
     <div className="flex flex-row items-start justify-center gap-8 p-8 bg-gray-900 min-h-screen">
@@ -175,6 +197,9 @@ const SimCanvas: React.FC = () => {
         isPlaying={isPlaying}
         sliderChange={handleSliderChange}
         onPlayButtonClick={handleSimClick}
+        minScore={currStats.min}
+        avgScore={currStats.avg}
+        maxScore={currStats.max}
       />
     </div>
   )

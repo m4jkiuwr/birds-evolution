@@ -34,6 +34,7 @@
     "typescript-eslint": "^8.35.1",
     "vite": "^7.0.5",
     "vite-plugin-top-level-await": "^1.6.0",
-    "vite-plugin-wasm": "^3.5.0"
+    "vite-plugin-wasm": "^3.5.0",
+    "lib-simulation-wasm": "file:./libs/simulation-wasm/pkg"
   }
 }
