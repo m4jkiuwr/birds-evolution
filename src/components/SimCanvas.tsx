@@ -84,22 +84,27 @@ function sharpenCanvas(canvas: HTMLCanvasElement): void {
     ctxt.scale(dpr, dpr);
   }
 }
-const paintCanvas = (world: WorldType, stats: StatType, canvasRef: React.RefObject<HTMLCanvasElement | null>) => {
+const paintCanvas = (world: WorldType,
+  stats: StatType,
+  allBirdsVisible: boolean,
+  canvasRef: React.RefObject<HTMLCanvasElement | null>) => {
   const canvas = canvasRef.current;
   if (!canvas) return;
   const ctxt = canvas.getContext('2d');
   if (!ctxt) return;
 
-  // Use the CSS dimensions for all drawing calculations.
   const [w, h] = [canvas.clientWidth, canvas.clientHeight];
 
   ctxt.clearRect(0, 0, w, h);
-  ctxt.fillStyle = 'rgba(217, 226, 246, 1)';
-  ctxt.beginPath();
-  world.animals.forEach((bird) => {
-    if (bird.score < stats.max_score && stats.max_score !== 0) ctxt.drawBird(bird, BIRD_SIZE * w, w, h)
-  });
-  ctxt.fill();
+
+  if (allBirdsVisible || stats.max_score === 0) {
+    ctxt.fillStyle = 'rgba(217, 226, 246, 1)';
+    ctxt.beginPath();
+    world.animals.forEach((bird) => {
+      if (bird.score < stats.max_score && stats.max_score !== 0) ctxt.drawBird(bird, BIRD_SIZE * w, w, h)
+    });
+    ctxt.fill();
+  }
 
   ctxt.fillStyle = 'rgba(248, 248, 92, 1)';
   ctxt.beginPath();
@@ -163,6 +168,7 @@ const SimCanvas: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [simSpeed, setSimSpeed] = useState<number>(1);
   const [statsHistory, setStatsHistory] = useState<StatType[]>([]);
+  const [allVisible, setAllVisible] = useState<boolean>(true);
 
   const currStats = calcStats(world);
   const populationCount = world?.animals.length || POPULATION_COUNT;
@@ -177,7 +183,7 @@ const SimCanvas: React.FC = () => {
 
   useEffect(() => {
     if (world) {
-      paintCanvas(world, currStats, canvasRef);
+      paintCanvas(world, currStats, allVisible, canvasRef);
     }
   }, [world]);
 
@@ -227,7 +233,7 @@ const SimCanvas: React.FC = () => {
     setStatsHistory([]);
     setIsPlaying(true);
   }
-
+  const handleVisibilityClick = () => setAllVisible(!allVisible)
 
   return (
 
@@ -261,6 +267,8 @@ const SimCanvas: React.FC = () => {
             foodCount={foodCount}
             populationCount={populationCount}
             onTrainButtonClick={handleTrainClick}
+            handleVisibilityClick={handleVisibilityClick}
+            allVisible={allVisible}
           />
           <RestartPanel
             onClick={handleRestart}

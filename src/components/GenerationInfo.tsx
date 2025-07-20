@@ -1,5 +1,5 @@
 import React from "react";
-import { Play, Pause, FastForward } from "lucide-react";
+import { Play, Pause, FastForward, Eye, EyeOff } from "lucide-react";
 
 const IconSize: number = 20;
 
@@ -58,8 +58,6 @@ const TrainButton: React.FC<TrainButtonProps> = ({ onTrainButtonClick }) => {
 
 }
 
-
-
 interface LiveInfoProps {
   minScore: number,
   maxScore: number,
@@ -108,7 +106,27 @@ const GeneralInfoDisplay: React.FC<GeneralProps> = ({ generation, populationCoun
   );
 }
 
-type GenerationInfoProps = SpeedSliderProps & PlayButtonProps & LiveInfoProps & GeneralProps & TrainButtonProps;
+interface VisibilityButtonProps {
+  allVisible: boolean,
+  handleVisibilityClick: () => void;
+}
+const VisibilityButton: React.FC<VisibilityButtonProps> = ({ allVisible, handleVisibilityClick }) => {
+  return (
+    <div>
+      <button
+        onClick={handleVisibilityClick}
+      >
+        {allVisible ? <EyeOff size={IconSize} /> : <Eye size={IconSize} />}
+      </button>
+    </div>
+  );
+
+
+}
+
+
+
+type GenerationInfoProps = SpeedSliderProps & PlayButtonProps & LiveInfoProps & GeneralProps & TrainButtonProps & VisibilityButtonProps;
 
 const GenerationInfo: React.FC<GenerationInfoProps> = ({
   sliderChange,
@@ -121,7 +139,9 @@ const GenerationInfo: React.FC<GenerationInfoProps> = ({
   populationCount,
   foodCount,
   generation,
-  onTrainButtonClick
+  onTrainButtonClick,
+  handleVisibilityClick,
+  allVisible
 }) => {
   return (
     <div className="flex flex-col gap-4 p-6 bg-gray-800 text-white rounded-lg shadow-xl">
@@ -155,6 +175,10 @@ const GenerationInfo: React.FC<GenerationInfoProps> = ({
         />
         <TrainButton
           onTrainButtonClick={onTrainButtonClick}
+        />
+        <VisibilityButton
+          handleVisibilityClick={handleVisibilityClick}
+          allVisible={allVisible}
         />
       </div>
     </div>
