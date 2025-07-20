@@ -34,8 +34,12 @@ impl Simulation {
         World::from(self.sim.world())
     }
 
-    pub fn step(&mut self) {
-        self.sim.step(&mut self.rng);
+    pub fn step(&mut self) -> Option<Statistics> {
+        if let Some(stats) = self.sim.step(&mut self.rng) {
+            Some(Statistics::from(stats))
+        } else {
+            None
+        }
     }
 
     pub fn train(&mut self) -> Statistics {

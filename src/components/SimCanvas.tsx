@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Simulation, World, Animal, Food } from '../simulation-wasm'
+import { Simulation, World, Animal, Food, Statistics } from '../simulation-wasm'
 import { PauseOverlay, HoverOverlay } from './PauseOverlay';
 import GenerationInfo from './GenerationInfo';
 
@@ -13,6 +13,7 @@ type SimType = InstanceType<typeof Simulation>
 type AnimalType = typeof Animal.prototype;
 type FoodType = typeof Food.prototype;
 type WorldType = typeof World.prototype;
+type StatType = Omit<typeof Statistics.prototype, 'free'>;
 
 declare global {
   interface CanvasRenderingContext2D {
@@ -104,15 +105,10 @@ const paintCanvas = (world: WorldType, canvasRef: React.RefObject<HTMLCanvasElem
 
 }
 
-type Stats = {
-  min: number,
-  avg: number,
-  max: number
-}
-function calcStats(world: WorldType | null): Stats {
+function calcStats(world: WorldType | null): StatType {
   if (!world || world.animals.length === 0) {
     return {
-      min: 0, avg: 0, max: 0
+      min_score: 0, max_score: 0, avg_score: 0
     }
   } else {
     const scores = world.animals.map((value) => value.score);
@@ -122,11 +118,21 @@ function calcStats(world: WorldType | null): Stats {
     const avgScore = scores.reduce((sum, score) => sum + score, 0) / scores.length;
 
     return {
-      min: minScore,
-      max: maxScore,
-      avg: parseFloat(avgScore.toFixed(2))
+      min_score: minScore,
+      max_score: maxScore,
+      avg_score: parseFloat(avgScore.toFixed(2))
     }
   }
+}
+
+function runSimulationStep(sim: SimType, speed: number): StatType[] {
+  const newStats: StatType[] = [];
+  for (let i = 0; i < speed; i++) {
+    const currStats = sim.step();
+    if (currStats !== undefined) newStats.push(currStats);
+  }
+  return newStats;
+
 }
 
 
@@ -139,10 +145,11 @@ const SimCanvas: React.FC = () => {
   const [world, setWorld] = useState<WorldType | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [simSpeed, setSimSpeed] = useState<number>(1);
+  const [statsHistory, setStatsHistory] = useState<StatType[]>([]);
 
 
   useEffect(() => {
-    simRef.current = startSimulation({ animalCount: 10, foodCount: 10 });
+    simRef.current = startSimulation({ animalCount: 40, foodCount: 60 });
     setWorld(simRef.current.world());
   }, []);
   useEffect(() => {
@@ -156,20 +163,24 @@ const SimCanvas: React.FC = () => {
   }, [world]);
 
   useEffect(() => {
-    if (!isPlaying || !simRef.current) return;
-    let animationFrameId: number;
+    if (!isPlaying || simRef.current === null) {
+      return;
+    } else {
+      const simulation = simRef.current;
+      let animationFrameId: number;
 
-    const gameLoop = () => {
-      for (let i = 0; i < simSpeed; i++) {
-        simRef.current?.step();
-      }
-      setWorld(simRef.current!.world());
-      animationFrameId = window.requestAnimationFrame(gameLoop)
-    };
+      const gameLoop = () => {
+        const genStats: StatType[] = runSimulationStep(simulation, simSpeed);
 
-    gameLoop();
+        setWorld(simulation.world());
+        setStatsHistory([...statsHistory, ...genStats]);
+        animationFrameId = window.requestAnimationFrame(gameLoop);
+      };
 
-    return () => window.cancelAnimationFrame(animationFrameId);
+      gameLoop();
+
+      return () => window.cancelAnimationFrame(animationFrameId);
+    }
   }, [isPlaying, simRef.current, simSpeed]);
 
   const handleSimClick = () => {
@@ -200,9 +211,9 @@ const SimCanvas: React.FC = () => {
         isPlaying={isPlaying}
         sliderChange={handleSliderChange}
         onPlayButtonClick={handleSimClick}
-        minScore={currStats.min}
-        avgScore={currStats.avg}
-        maxScore={currStats.max}
+        minScore={currStats.min_score}
+        avgScore={currStats.avg_score}
+        maxScore={currStats.max_score}
       />
     </div>
   )
