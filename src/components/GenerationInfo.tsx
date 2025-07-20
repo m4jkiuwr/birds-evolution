@@ -48,7 +48,6 @@ const GenerationInfo: React.FC<GenerationInfoProps> = ({
   onPlayButtonClick,
   isPlaying,
 }) => {
-  // Add the return statement with the JSX for the card
   return (
     <div className="flex flex-col gap-6 p-6 bg-gray-800 text-white rounded-lg shadow-xl w-[300px]">
       <h2 className="text-2xl font-bold text-center border-b border-gray-600 pb-3">
