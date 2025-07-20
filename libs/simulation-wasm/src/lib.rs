@@ -1,12 +1,14 @@
 mod animal;
 mod food;
+mod statistics;
 mod world;
 
+use lib_genetic_algorithm as ga;
 use lib_simulation as sim;
 use rand::{self, rngs::ThreadRng};
 use wasm_bindgen::prelude::*;
 
-pub use self::{animal::*, food::*, world::*};
+pub use self::{animal::*, food::*, statistics::*, world::*};
 
 #[wasm_bindgen]
 pub fn test_fun() -> String {
@@ -32,17 +34,12 @@ impl Simulation {
         World::from(self.sim.world())
     }
 
-    pub fn step(&mut self) -> String {
-        if let Some(stats) = self.sim.step(&mut self.rng) {
-            stats.to_string()
-        } else {
-            String::from("")
-        }
+    pub fn step(&mut self) {
+        self.sim.step(&mut self.rng);
     }
 
-    pub fn train(&mut self) -> String {
-        let stats = self.sim.train(&mut self.rng);
-        stats.to_string()
+    pub fn train(&mut self) -> Statistics {
+        Statistics::from(self.sim.train(&mut self.rng))
     }
 }
 
