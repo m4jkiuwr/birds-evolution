@@ -3,6 +3,7 @@ import { Simulation, World, Animal, Food, Statistics } from '../simulation-wasm'
 import { PauseOverlay, HoverOverlay } from './PauseOverlay';
 import GenerationInfo from './GenerationInfo';
 import HistoryChart from './HistoryChart';
+import RestartPanel from './RestartPanel';
 
 const BIRD_SIZE: number = 0.02;
 const FOOD_SIZE: number = 0.005;
@@ -83,7 +84,7 @@ function sharpenCanvas(canvas: HTMLCanvasElement): void {
     ctxt.scale(dpr, dpr);
   }
 }
-const paintCanvas = (world: WorldType, canvasRef: React.RefObject<HTMLCanvasElement | null>) => {
+const paintCanvas = (world: WorldType, stats: StatType, canvasRef: React.RefObject<HTMLCanvasElement | null>) => {
   const canvas = canvasRef.current;
   if (!canvas) return;
   const ctxt = canvas.getContext('2d');
@@ -95,8 +96,20 @@ const paintCanvas = (world: WorldType, canvasRef: React.RefObject<HTMLCanvasElem
   ctxt.clearRect(0, 0, w, h);
   ctxt.fillStyle = 'rgba(217, 226, 246, 1)';
   ctxt.beginPath();
-  world.animals.forEach((bird) => ctxt.drawBird(bird, BIRD_SIZE * w, w, h))
+  world.animals.forEach((bird) => {
+    if (bird.score < stats.max_score && stats.max_score !== 0) ctxt.drawBird(bird, BIRD_SIZE * w, w, h)
+  });
   ctxt.fill();
+
+  ctxt.fillStyle = 'rgba(248, 248, 92, 1)';
+  ctxt.beginPath();
+  world.animals.forEach((bird) => {
+    if (bird.score === stats.max_score && stats.max_score !== 0) ctxt.drawBird(bird, BIRD_SIZE * w, w, h)
+  });
+  ctxt.fill();
+
+
+
 
   ctxt.fillStyle = 'rgba(72, 178, 100, 1)';
   ctxt.beginPath();
@@ -151,7 +164,9 @@ const SimCanvas: React.FC = () => {
   const [simSpeed, setSimSpeed] = useState<number>(1);
   const [statsHistory, setStatsHistory] = useState<StatType[]>([]);
 
-
+  const currStats = calcStats(world);
+  const populationCount = world?.animals.length || POPULATION_COUNT;
+  const foodCount = world?.foods.length || FOOD_COUNT;
   useEffect(() => {
     simRef.current = startSimulation({ animalCount: POPULATION_COUNT, foodCount: FOOD_COUNT });
     setWorld(simRef.current.world());
@@ -162,7 +177,7 @@ const SimCanvas: React.FC = () => {
 
   useEffect(() => {
     if (world) {
-      paintCanvas(world, canvasRef);
+      paintCanvas(world, currStats, canvasRef);
     }
   }, [world]);
 
@@ -204,9 +219,15 @@ const SimCanvas: React.FC = () => {
       setStatsHistory([...statsHistory, newStats]);
     }
   }
+  const handleRestart = (populationCnt: number, foodCnt: number) => {
+    setIsPlaying(false);
+    const newSim = startSimulation({ animalCount: populationCnt, foodCount: foodCnt });
+    if (simRef !== null) simRef.current?.free();
+    simRef.current = newSim;
+    setStatsHistory([]);
+    setIsPlaying(true);
+  }
 
-
-  const currStats = calcStats(world);
 
   return (
 
@@ -227,7 +248,7 @@ const SimCanvas: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-4 w-full h-full p-6 overflow-y-auto flex-shrink-0 border-l border-gray-700">
-        <div>
+        <div className="flex flex-col gap-6">
           <GenerationInfo
             currentSpeed={simSpeed}
             isPlaying={isPlaying}
@@ -237,9 +258,14 @@ const SimCanvas: React.FC = () => {
             avgScore={currStats.avg_score}
             maxScore={currStats.max_score}
             generation={statsHistory.length + 1}
-            foodCount={FOOD_COUNT}
-            populationCount={POPULATION_COUNT}
+            foodCount={foodCount}
+            populationCount={populationCount}
             onTrainButtonClick={handleTrainClick}
+          />
+          <RestartPanel
+            onClick={handleRestart}
+            initPopulationCnt={populationCount}
+            initFoodCnt={foodCount}
           />
         </div>
         <HistoryChart statsHistory={statsHistory} />

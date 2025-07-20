@@ -124,7 +124,7 @@ const GenerationInfo: React.FC<GenerationInfoProps> = ({
   onTrainButtonClick
 }) => {
   return (
-    <div className="flex flex-col gap-4 p-6 bg-gray-800 text-white rounded-lg shadow-xl w-[300px]">
+    <div className="flex flex-col gap-4 p-6 bg-gray-800 text-white rounded-lg shadow-xl">
       <h2 className="text-2xl font-bold text-center border-b border-gray-600 pb-3">
         Simulation
       </h2>
