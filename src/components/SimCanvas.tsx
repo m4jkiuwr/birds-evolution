@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Simulation, World, Animal, Food } from '../simulation-wasm'
-import PauseOverlay from './PauseOverlay';
+import { PauseOverlay, HoverOverlay } from './PauseOverlay';
 import GenerationInfo from './GenerationInfo';
 
 const BIRD_SIZE: number = 0.02;
@@ -190,7 +190,10 @@ const SimCanvas: React.FC = () => {
           className="w-full h-full"
           onClick={handleSimClick}
         />
-        {!isPlaying && <PauseOverlay onClick={handleSimClick} />}
+        {isPlaying ?
+          <HoverOverlay onClick={handleSimClick} /> :
+          <PauseOverlay onClick={handleSimClick} />
+        }
       </div>
       <GenerationInfo
         currentSpeed={simSpeed}

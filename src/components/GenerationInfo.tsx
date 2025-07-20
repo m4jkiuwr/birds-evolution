@@ -49,11 +49,21 @@ interface LiveInfoProps {
 }
 const LiveInfo: React.FC<LiveInfoProps> = ({ minScore, maxScore, avgScore }) => {
   return (
-    <>
-      {minScore} | {avgScore} | {maxScore}
-    </>
+    <div className="grid grid-cols-3 gap-2 text-center p-2 bg-gray-700/50 rounded-lg">
+      <div>
+        <div className="text-xs text-gray-400">MIN</div>
+        <div className="font-mono text-lg">{minScore}</div>
+      </div>
+      <div>
+        <div className="text-xs text-gray-400">AVG</div>
+        <div className="font-mono text-lg">{avgScore}</div>
+      </div>
+      <div>
+        <div className="text-xs text-gray-400">MAX</div>
+        <div className="font-mono text-lg">{maxScore}</div>
+      </div>
+    </div>
   );
-
 }
 
 
