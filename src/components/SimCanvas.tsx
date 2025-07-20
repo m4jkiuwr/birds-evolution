@@ -209,35 +209,43 @@ const SimCanvas: React.FC = () => {
   const currStats = calcStats(world);
 
   return (
-    <div className="flex flex-row items-start justify-center gap-8 p-8 bg-gray-900 min-h-screen">
-      <div className="relative w-[800px] h-[800px] border border-white">
-        <canvas
-          ref={canvasRef}
-          className="w-full h-full"
-          onClick={handleSimClick}
-        />
-        {isPlaying ?
-          <HoverOverlay onClick={handleSimClick} /> :
-          <PauseOverlay onClick={handleSimClick} />
-        }
+
+    <div className="grid grid-cols-2 h-screen w-screen bg-gray-900 text-white overflow-hidden">
+
+      <div className="flex-grow flex items-center justify-center p-8">
+        <div className="relative w-full h-auto max-h-[calc(100vh-4rem)] aspect-square border border-white group">
+          <canvas
+            ref={canvasRef}
+            className="w-full h-full"
+            onClick={handleSimClick}
+          />
+          {isPlaying ?
+            <HoverOverlay onClick={handleSimClick} /> :
+            <PauseOverlay onClick={handleSimClick} />
+          }
+        </div>
       </div>
-      <div className="gap-6">
-        <GenerationInfo
-          currentSpeed={simSpeed}
-          isPlaying={isPlaying}
-          sliderChange={handleSliderChange}
-          onPlayButtonClick={handleSimClick}
-          minScore={currStats.min_score}
-          avgScore={currStats.avg_score}
-          maxScore={currStats.max_score}
-          generation={statsHistory.length + 1}
-          foodCount={FOOD_COUNT}
-          populationCount={POPULATION_COUNT}
-          onTrainButtonClick={handleTrainClick}
-        />
+
+      <div className="grid grid-cols-2 gap-4 w-full h-full p-6 overflow-y-auto flex-shrink-0 border-l border-gray-700">
+        <div>
+          <GenerationInfo
+            currentSpeed={simSpeed}
+            isPlaying={isPlaying}
+            sliderChange={handleSliderChange}
+            onPlayButtonClick={handleSimClick}
+            minScore={currStats.min_score}
+            avgScore={currStats.avg_score}
+            maxScore={currStats.max_score}
+            generation={statsHistory.length + 1}
+            foodCount={FOOD_COUNT}
+            populationCount={POPULATION_COUNT}
+            onTrainButtonClick={handleTrainClick}
+          />
+        </div>
         <HistoryChart statsHistory={statsHistory} />
       </div>
     </div>
+
   )
 
 }

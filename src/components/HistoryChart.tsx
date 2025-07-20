@@ -1,11 +1,8 @@
 import React from 'react';
+import { Statistics } from '../simulation-wasm'
 
-// Define the type for a single stat object, matching what's in SimCanvas
-interface StatType {
-  min_score: number;
-  avg_score: number;
-  max_score: number;
-}
+type StatType = Omit<typeof Statistics.prototype, 'free'>;
+
 
 interface HistoryChartProps {
   statsHistory: StatType[];
@@ -13,8 +10,8 @@ interface HistoryChartProps {
 
 const HistoryChart: React.FC<HistoryChartProps> = ({ statsHistory }) => {
   return (
-    <div className="flex flex-col gap-4 p-6 bg-gray-800 text-white rounded-lg shadow-xl w-[300px]">
-      <h2 className="text-2xl font-bold text-center border-b border-gray-600 pb-3">
+    <div className="flex flex-col gap-4 p-6 bg-gray-800 text-white rounded-lg shadow-xl w-full flex-grow min-h-0">
+      <h2 className="text-2xl font-bold text-center border-b border-gray-600 pb-3 flex-shrink-0">
         History
       </h2>
       {statsHistory.length === 0 ? (
@@ -22,21 +19,21 @@ const HistoryChart: React.FC<HistoryChartProps> = ({ statsHistory }) => {
           No completed generations yet.
         </p>
       ) : (
-        <div className="flex flex-col gap-2 overflow-y-auto max-h-[500px] pr-2">
+        <div className="flex flex-col gap-2 overflow-y-auto pr-2">
           {/* Header Row */}
-          <div className="grid grid-cols-4 gap-2 text-sm font-bold text-gray-400 sticky top-0 bg-gray-800 pb-2">
-            <div className="text-left">Gen</div>
-            <div className="text-right">Min</div>
-            <div className="text-right">Avg</div>
-            <div className="text-right">Max</div>
+          <div className="grid grid-cols-4 text-sm font-bold text-gray-400 sticky top-0 bg-gray-800 pb-2 border-b border-gray-600">
+            <div className="text-center px-2 border-r border-gray-700">Gen</div>
+            <div className="text-center px-2 border-r border-gray-700">Min</div>
+            <div className="text-center px-2 border-r border-gray-700">Avg</div>
+            <div className="text-center px-2">Max</div>
           </div>
           {/* Data Rows */}
           {statsHistory.map((stats, index) => (
-            <div key={index} className="grid grid-cols-4 gap-2 text-sm font-mono">
-              <div className="text-left font-sans font-semibold text-gray-300">{index + 1}</div>
-              <div className="text-right">{stats.min_score}</div>
-              <div className="text-right">{parseFloat(stats.avg_score.toFixed(2))}</div>
-              <div className="text-right">{stats.max_score}</div>
+            <div key={index} className="grid grid-cols-4 text-sm font-mono py-1 items-center">
+              <div className="text-center font-sans font-semibold text-gray-300 px-2 border-r border-gray-700">{index + 1}</div>
+              <div className="text-center px-2 border-r border-gray-700">{stats.min_score}</div>
+              <div className="text-center px-2 border-r border-gray-700">{parseFloat(stats.avg_score.toFixed(2))}</div>
+              <div className="text-center px-2">{stats.max_score}</div>
             </div>
           ))}
         </div>

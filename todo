@@ -1,0 +1,5 @@
+Improve the history component
+Make the loading overlay
+Make the train button block when loading
+Add restart button
+Add customizable options for size of population and number of food

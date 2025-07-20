@@ -8,9 +8,7 @@ import SimCanvas from './components/SimCanvas'
 function App() {
   return (
     <>
-      <div>
-        <SimCanvas />
-      </div>
+      <SimCanvas />
     </>
   )
 }
