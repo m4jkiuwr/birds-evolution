@@ -1,7 +1,7 @@
 # 🐦 Birds Evolution Simulation
 
 A neural network-powered evolution simulation where birds learn to survive and find food using genetic algorithms. Watch as generations of birds evolve better survival strategies!
-
+[See Live!](https://m4jkiuwr.github.io/birds-evolution)
 ## 🚀 Getting Started
 
 ### Prerequisites
