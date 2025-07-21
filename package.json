@@ -2,7 +2,7 @@
   "name": "neural-networks",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://m4jkiuwr.github.io/neural-networks/",
+  "homepage": "https://m4jkiuwr.github.io/birds-evolution/",
   "type": "module",
   "scripts": {
     "wasm": "wasm-pack build ./libs/simulation-wasm --target web --release",

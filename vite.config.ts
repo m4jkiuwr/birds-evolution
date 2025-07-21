@@ -7,5 +7,5 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  base: '/neural-networks'
+  base: '/birds-evolution'
 })
